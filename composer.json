@@ -1,0 +1,35 @@
+{
+    "name": "blocks/http",
+    "type": "library",
+    "description": "Blocks - Base",
+    "require": {
+        "php": ">=5.5.0",
+        "blocks/base": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Lukasz Witaszczyk",
+            "email": "Lukasz.Witaszczyk@gmail.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@github.com:lwitaszczyk/blocks-base.git",
+            "reference": "master"
+        }
+    ],
+    "require-dev": {
+        "phpspec/phpspec": "2.2.*",
+        "squizlabs/php_codesniffer": "^2.5",
+        "fabpot/php-cs-fixer": "^1.10"
+    },
+    "autoload": {
+        "psr-0": {
+            "": "src"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
