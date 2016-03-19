@@ -14,6 +14,7 @@ use Blocks\Http\Exception\HttpApplicationCanNotRenderOutputException;
 use Blocks\Http\Exception\HttpApplicationResponseIsNullException;
 use Blocks\Http\Native\Cookie;
 use Blocks\Http\Native\Session;
+use Blocks\Http\Request\RequestFromGlobals;
 
 class HttpApplication extends Application
 {
@@ -45,7 +46,7 @@ class HttpApplication extends Application
     ) {
         parent::__construct($configuration);
 
-        $this->request = (is_null($request)) ? $this->request = new Request() : $request;
+        $this->request = (is_null($request)) ? $this->request = new RequestFromGlobals() : $request;
 
         $this->getContainer()->add([
             (new DIAsValue(self::REQUEST, $this->request)),
