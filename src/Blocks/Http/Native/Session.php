@@ -18,7 +18,7 @@ class Session implements SessionInterface
         }
         session_cache_expire($expire);
         session_start();
-        session_regenerate_id();
+//        session_regenerate_id();
     }
 
     /**
@@ -71,6 +71,7 @@ class Session implements SessionInterface
     {
         $key = (string)$key;
         unset($_SESSION[$key]);
+        session_commit();
     }
 
     /**

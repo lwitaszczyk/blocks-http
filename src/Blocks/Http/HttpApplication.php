@@ -43,7 +43,8 @@ class HttpApplication extends Application
     public function __construct(
         Request $request = null,
         Configuration $configuration = null
-    ) {
+    )
+    {
         parent::__construct($configuration);
 
         $this->request = (is_null($request)) ? $this->request = new RequestFromGlobals() : $request;
@@ -85,12 +86,23 @@ class HttpApplication extends Application
 
             $response->send();
         } catch (\Exception $exception) {
-            if (!$this->onException($exception)) {
+            $result = $this->onException($exception);
+            if ($result instanceof Response) {
+                $result->send();
+            } else {
                 throw $exception;
             }
         }
 
         return $this;
+    }
+
+    /**
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -102,24 +114,6 @@ class HttpApplication extends Application
             $this->routing = $this->getContainer()->get(self::ROUTING);
         }
         return $this->routing;
-    }
-
-    /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-
-    /**
-     * @param string $name
-     * @return Route
-     */
-    public function findRouteByName($name)
-    {
-        return $this->getRouting()->findByName($name);
     }
 
     /**
@@ -135,6 +129,15 @@ class HttpApplication extends Application
             throw new HttpApplicationCanNotFoundRouteException($routeName);
         }
         return $this->urlByRoute($route, $params);
+    }
+
+    /**
+     * @param string $name
+     * @return Route
+     */
+    public function findRouteByName($name)
+    {
+        return $this->getRouting()->findByName($name);
     }
 
     /**
