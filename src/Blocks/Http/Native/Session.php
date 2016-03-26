@@ -18,17 +18,15 @@ class Session implements SessionInterface
         }
         session_cache_expire($expire);
         session_start();
-//        session_regenerate_id();
+        session_regenerate_id();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function exists($key)
+    public function has($key)
     {
-        $key = (string)$key;
-
-        return (isset($_SESSION[$key]));
+        return array_key_exists((string)$key, $_SESSION);
     }
 
     /**
@@ -37,8 +35,7 @@ class Session implements SessionInterface
     public function get($key, $default = null)
     {
         $key = (string)$key;
-
-        return (isset($_SESSION[$key])) ? $_SESSION[$key] : $default;
+        return (array_key_exists($key, $_SESSION)) ? $_SESSION[$key] : $default;
     }
 
     /**
@@ -46,11 +43,8 @@ class Session implements SessionInterface
      */
     public function replace($key, $value = null, $default = null)
     {
-        $key = (string)$key;
-        $r = $this->get($key, $default);
-        $this->set($key, $value);
-
-        return $r;
+        $this->set((string)$key, $value);
+        return $this;
     }
 
     /**
@@ -58,10 +52,8 @@ class Session implements SessionInterface
      */
     public function set($key, $value = null)
     {
-        $key = (string)$key;
-        $_SESSION[$key] = $value;
-
-        return $value;
+        $_SESSION[(string)$key] = $value;
+        return $this;
     }
 
     /**
@@ -74,15 +66,15 @@ class Session implements SessionInterface
         session_commit();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function destroy()
-    {
-        foreach ($_SESSION as $key => $value) {
-            unset($_SESSION[$key]);
-        }
-        session_destroy();
-        session_commit();
-    }
+//    /**
+//     * {@inheritdoc}
+//     */
+//    public function destroy()
+//    {
+//        foreach ($_SESSION as $key => $value) {
+//            unset($_SESSION[$key]);
+//        }
+//        session_destroy();
+//        session_commit();
+//    }
 }

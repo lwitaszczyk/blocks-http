@@ -9,7 +9,7 @@ interface Session
      *
      * @return bool
      */
-    public function exists($key);
+    public function has($key);
 
     /**
      * @param string     $key
@@ -43,8 +43,8 @@ interface Session
      */
     public function delete($key);
 
-    /**
-     * @return self
-     */
-    public function destroy();
+//    /**
+//     * @return self
+//     */
+//    public function destroy();
 }

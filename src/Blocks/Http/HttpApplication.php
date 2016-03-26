@@ -46,6 +46,7 @@ class HttpApplication extends Application
     )
     {
         parent::__construct($configuration);
+        ob_start();
 
         $this->request = (is_null($request)) ? $this->request = new RequestFromGlobals() : $request;
 
@@ -72,7 +73,6 @@ class HttpApplication extends Application
         $routing = $this->getRouting();
 
         try {
-            ob_start();
 
             $response = $routing->process($request);
 
