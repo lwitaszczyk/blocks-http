@@ -13,13 +13,6 @@ class RouteGroup implements Route
     use RoutesTrait;
 
     /**
-     *
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function findByName($name)
