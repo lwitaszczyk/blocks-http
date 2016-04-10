@@ -2,7 +2,7 @@
 
 namespace Blocks\Http;
 
-use Http\Routing\Parameter;
+use Blocks\Http\Routing\Parameter;
 
 interface Route
 {
@@ -32,7 +32,7 @@ interface Route
     public function generateUrl(Request $request);
 
     /**
-     * @return Parameter[]
+     * @return Parameter
      */
     public function getParameters();
 
