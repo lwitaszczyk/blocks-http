@@ -39,12 +39,14 @@ interface Route
     public function getParameters();
 
     /**
+     * @deprecated
      * @param Route $parent
      * @return $this
      */
     public function setParent(Route $parent);
 
     /**
+     * @deprecated
      * @return Route
      */
     public function getParent();
