@@ -50,7 +50,7 @@ class HttpApplication extends Application
 
         $this->request = (is_null($request)) ? $this->request = new RequestFromGlobals() : $request;
 
-        $this->getContainer()->add([
+        $this->getContainer()->addServices([
             (new DIAsValue(self::REQUEST, $this->request)),
             (new DIAsProxySingleton(self::SESSION, Session::class))->addArguments([
                 new DIByConfiguration('session.sid', 'SID'),
@@ -128,7 +128,7 @@ class HttpApplication extends Application
         if (empty($route)) {
             throw new HttpApplicationCanNotFoundRouteException($routeName);
         }
-        return $this->urlByRoute($route, $params);
+        return $route->generateUrl($this->getRequest(), $params);
     }
 
     /**
@@ -138,20 +138,5 @@ class HttpApplication extends Application
     public function findRouteByName($name)
     {
         return $this->getRouting()->findByName($name);
-    }
-
-    /**
-     * @param Route $route
-     * @param string[] $params
-     * @return string
-     */
-    public function urlByRoute(Route $route, array $params = [])
-    {
-        $separator = '/';
-        $url = $route->generateUrl($this->getRequest());
-        if (!empty($params)) {
-            $url .= $separator . implode($separator, $params);
-        }
-        return $separator . trim($url, $separator);
     }
 }

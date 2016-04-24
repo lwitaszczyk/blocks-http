@@ -36,7 +36,7 @@ abstract class Request
     {
         $this->attributes = [];
         $this->parameters = [];
-        $this->currentPath = '/' . trim($this->getPathInfo(), '/');
+        $this->currentPath = $this->getPath();
 
         $this->setAttribute('ajax', $this->isAjax());
         $this->setAttribute('host', $this->getHost());
@@ -120,7 +120,7 @@ abstract class Request
     /**
      * @return string
      */
-    abstract public function getPathInfo();
+    abstract public function getPath();
 
     /**
      * @param null $name

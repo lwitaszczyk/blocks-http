@@ -50,9 +50,10 @@ class RequestFromGlobals extends Request
     /**
      * @return string
      */
-    public function getPathInfo()
+    public function getPath()
     {
-        return filter_input(INPUT_SERVER, 'PATH_INFO');
+        $path = filter_input(INPUT_SERVER, 'PATH_INFO');
+        return (is_null($path)) ? '/' : $path;
     }
 
     /**
