@@ -8,6 +8,7 @@ interface Route
 {
 
     /**
+     * @deprecated
      * @param Request $request
      * @return bool
      */
@@ -32,7 +33,8 @@ interface Route
     public function generateUrl(Request $request);
 
     /**
-     * @return Parameter
+     * @deprecated
+     * @return Parameter[]
      */
     public function getParameters();
 

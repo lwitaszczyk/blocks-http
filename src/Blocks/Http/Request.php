@@ -20,6 +20,11 @@ abstract class Request
     private $attributes;
 
     /**
+     * @var mixed[]
+     */
+    private $parameters;
+
+    /**
      * @var string
      */
     private $currentPath;
@@ -30,6 +35,7 @@ abstract class Request
     public function __construct()
     {
         $this->attributes = [];
+        $this->parameters = [];
         $this->currentPath = '/' . trim($this->getPathInfo(), '/');
 
         $this->setAttribute('ajax', $this->isAjax());
@@ -43,7 +49,7 @@ abstract class Request
      */
     public function setAttribute($name, $value)
     {
-        $this->attributes[$name] = $value;
+        $this->attributes[(string)$name] = $value;
         return $this;
     }
 
@@ -55,6 +61,35 @@ abstract class Request
     public function getAttribute($name, $default = null)
     {
         return isset($this->attributes[$name]) ? $this->attributes[$name] : $default;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @return $this
+     */
+    public function setParameter($name, $value)
+    {
+        $this->parameters[(string)$name] = $value;
+        return $this;
+    }
+
+    /**
+     * @return \mixed[]
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return mixed|null
+     */
+    public function getParameter($name, $default = null)
+    {
+        return isset($this->parameters[$name]) ? $this->parameters[$name] : $default;
     }
 
     /**
@@ -117,6 +152,7 @@ abstract class Request
     abstract public function getClientLocale();
 
     /**
+     * @deprecated
      * @return string
      */
     public function getCurrentPath()
@@ -125,6 +161,7 @@ abstract class Request
     }
 
     /**
+     * @deprecated
      * @param string $currentPath
      * @return $this
      */
