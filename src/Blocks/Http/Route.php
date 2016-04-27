@@ -29,4 +29,15 @@ interface Route
      * @return string
      */
     public function generateUrl(array $params = []);
+
+    /**
+     * @param Route $parentRoute
+     * @return $this
+     */
+    public function setParentRoute(Route $parentRoute);
+
+    /**
+     * @return Route|null
+     */
+    public function getParentRoute();
 }
