@@ -6,6 +6,14 @@ interface Route
 {
     /**
      * @param Request $request
+     * @param bool $exact
+     * @return bool
+     * @throws \Exception
+     */
+    public function match(Request $request, $exact = true);
+
+    /**
+     * @param Request $request
      * @return bool
      */
     public function process(Request $request);
@@ -17,8 +25,8 @@ interface Route
     public function findByName($name);
 
     /**
-     * @param Request $request
-     * @return $this
+     * @param array $params
+     * @return string
      */
-    public function generateUrl(Request $request);
+    public function generateUrl(array $params = []);
 }
