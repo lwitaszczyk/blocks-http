@@ -128,7 +128,7 @@ class HttpApplication extends Application
         if (empty($route)) {
             throw new HttpApplicationCanNotFoundRouteException($routeName);
         }
-        return $route->generateUrl($this->getRequest(), $params);
+        return $route->generateUrl($params);
     }
 
     /**
