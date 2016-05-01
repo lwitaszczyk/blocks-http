@@ -84,6 +84,7 @@ class RequestFromGlobals extends Request
     }
 
     /**
+     * @deprecated
      * @param null $name
      * @param array $default
      * @return mixed|null
@@ -91,6 +92,44 @@ class RequestFromGlobals extends Request
     public function getGet($name = null, $default = [])
     {
         return $this->getValueFromArray(INPUT_GET, $name, $default);
+    }
+
+    /**
+     * @return array
+     */
+    public function getQueryParams()
+    {
+        return $this->getValueFromArray(INPUT_GET);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getQueryValue($key, $default = null)
+    {
+        $value = $this->getQueryParams();
+
+        $keys = explode('.', $key);
+        $key = reset($keys);
+
+        do {
+            if (array_key_exists($key, $value)) {
+                $value = $value[$key];
+            } else {
+                return $default;
+            }
+            $key = next($keys);
+        } while ($key !== false);
+
+        return $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCookieParams()
+    {
+        return $this->getValueFromArray(INPUT_COOKIE);
     }
 
     /**

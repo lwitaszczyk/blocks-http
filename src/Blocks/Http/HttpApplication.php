@@ -11,7 +11,6 @@ use Blocks\DI\DIByConfiguration;
 use Blocks\DI\DIByService;
 use Blocks\Http\Exception\HttpApplicationCanNotFoundRouteException;
 use Blocks\Http\Exception\HttpApplicationCanNotRenderOutputException;
-use Blocks\Http\Exception\HttpApplicationResponseIsNullException;
 use Blocks\Http\Native\Cookie;
 use Blocks\Http\Native\Session;
 use Blocks\Http\Request\RequestFromGlobals;
@@ -46,6 +45,7 @@ class HttpApplication extends Application
     )
     {
         parent::__construct($configuration);
+
         ob_start();
 
         $this->request = (is_null($request)) ? $this->request = new RequestFromGlobals() : $request;
@@ -72,26 +72,12 @@ class HttpApplication extends Application
         $request = $this->getRequest();
         $routing = $this->getRouting();
 
-        try {
+        $response = $routing->process($request);
 
-            $response = $routing->process($request);
-
-            if (is_null($response)) {
-                throw new HttpApplicationResponseIsNullException();
-            }
-
-            if (!$response instanceof Response) {
-                throw new HttpApplicationCanNotRenderOutputException($response);
-            }
-
+        if ($response instanceof Response) {
             $response->send();
-        } catch (\Exception $exception) {
-            $result = $this->onException($exception);
-            if ($result instanceof Response) {
-                $result->send();
-            } else {
-                throw $exception;
-            }
+        } else {
+            throw new HttpApplicationCanNotRenderOutputException();
         }
 
         return $this;
