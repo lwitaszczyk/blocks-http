@@ -50,8 +50,8 @@ class RoutesGroup extends BaseRoute
         return $this;
     }
 
-    public function beforeProcess(Request $request) {
-
+    public function beforeProcess(Request $request)
+    {
     }
 
     /**

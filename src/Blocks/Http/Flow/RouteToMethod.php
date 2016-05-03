@@ -50,7 +50,6 @@ class RouteToMethod extends BaseRoute
     public function process(Request $request)
     {
         if ($this->match($request)) {
-
             $controller = $this->routeToController->getController();
             $methodName = sprintf('%sAction', $this->method);
 
@@ -70,7 +69,7 @@ class RouteToMethod extends BaseRoute
                 $paramClass = $reflectionParameter->getClass();
                 $paramName = $reflectionParameter->getName();
                 if (isset($paramClass)) {
-//TODO converters
+                    //TODO converters
                     if ($paramClass->getName() === Request::class) {
                         $parameters[$paramName] =
                             HttpApplication::getInstance()->getContainer()->get(HttpApplication::REQUEST);
@@ -96,7 +95,6 @@ class RouteToMethod extends BaseRoute
                             get_class($controller))
                     );
                 }
-
             }
             return $reflectionMethod->invokeArgs($controller, $parameters);
         }

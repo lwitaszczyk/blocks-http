@@ -59,7 +59,6 @@ REGEX;
         );
 
         foreach ($variants as $routeVariant) {
-
             $paramsCount = 0;
             foreach ($routeVariant as $segment) {
                 if (is_array($segment)) {
@@ -70,7 +69,6 @@ REGEX;
             if ($paramsCount === count($params)) {
                 return $this->generateUrlFromSegments($params, $routeVariant);
             }
-
         }
 
         throw new \Exception(sprintf('Can not generate url for action %s', $this->getName()));

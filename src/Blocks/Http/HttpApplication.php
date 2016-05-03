@@ -42,8 +42,7 @@ class HttpApplication extends Application
     public function __construct(
         Request $request = null,
         Configuration $configuration = null
-    )
-    {
+    ) {
         parent::__construct($configuration);
 
         ob_start();

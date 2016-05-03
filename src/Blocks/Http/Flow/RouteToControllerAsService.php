@@ -60,7 +60,6 @@ class RouteToControllerAsService extends BaseRoute
     public function process(Request $request)
     {
         if ($this->match($request, false)) {
-
             foreach ($this->routesToMethod as $routeToMethod) {
                 $response = $routeToMethod->process($request);
                 if (!is_null($response)) {
@@ -89,7 +88,8 @@ class RouteToControllerAsService extends BaseRoute
      * @return mixed
      * @throws \Blocks\DI\Exception\ServiceNotDefinedInContainerException
      */
-    public function getController() {
+    public function getController()
+    {
         return Application::getInstance()->getContainer()->get($this->serviceId);
     }
 }
