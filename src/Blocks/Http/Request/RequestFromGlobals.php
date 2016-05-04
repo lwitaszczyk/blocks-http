@@ -26,6 +26,14 @@ class RequestFromGlobals extends Request
     /**
      * @return string
      */
+    public function getScheme()
+    {
+        return filter_input(INPUT_SERVER, 'REQUEST_SCHEME');
+    }
+
+    /**
+     * @return string
+     */
     public function getMethod()
     {
         return filter_input(INPUT_SERVER, 'REQUEST_METHOD');

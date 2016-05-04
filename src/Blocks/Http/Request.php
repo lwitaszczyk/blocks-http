@@ -105,6 +105,11 @@ abstract class Request
     /**
      * @return string
      */
+    abstract public function getScheme();
+
+    /**
+     * @return string
+     */
     abstract public function getMethod();
 
     /**
