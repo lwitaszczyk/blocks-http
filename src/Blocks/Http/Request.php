@@ -177,7 +177,36 @@ abstract class Request
     }
 
     /**
+     * @return array|null
+     */
+    abstract public function getQueryParams();
+
+    /**
      * @return string
      */
     abstract public function getRawContent();
+
+    /**
+     * @param $key
+     * @param null $default
+     * @return array|string|null
+     */
+    public function getQueryValue($key, $default = null)
+    {
+        $value = $this->getQueryParams();
+
+        $keys = explode('.', $key);
+        $key = reset($keys);
+
+        do {
+            if (array_key_exists($key, $value)) {
+                $value = $value[$key];
+            } else {
+                return $default;
+            }
+            $key = next($keys);
+        } while ($key !== false);
+
+        return $value;
+    }
 }
