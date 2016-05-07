@@ -7,6 +7,17 @@ use Blocks\Http\Request;
 class RequestFromGlobals extends Request
 {
 
+    private $clientIP;
+
+    /**
+     * @inheritDoc
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->clientIP = null;
+    }
+
     /**
      * @return bool
      */
@@ -111,28 +122,6 @@ class RequestFromGlobals extends Request
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getQueryValue($key, $default = null)
-    {
-        $value = $this->getQueryParams();
-
-        $keys = explode('.', $key);
-        $key = reset($keys);
-
-        do {
-            if (array_key_exists($key, $value)) {
-                $value = $value[$key];
-            } else {
-                return $default;
-            }
-            $key = next($keys);
-        } while ($key !== false);
-
-        return $value;
-    }
-
-    /**
      * @return array
      */
     public function getCookieParams()
@@ -145,21 +134,11 @@ class RequestFromGlobals extends Request
      */
     public function getClientIP()
     {
-        $httpHeaders = [
-            'HTTP_TRUE_CLIENT_IP',
-            'X_FORWARDED_FOR',
-            'HTTP_X_FORWARDED_FOR',
-            'CLIENT_IP',
-            'REMOTE_ADDR',
-        ];
-        foreach ($httpHeaders as $key) {
-            $ip = filter_input(INPUT_SERVER, $key);
-            if (!is_null($ip)) {
-                return $ip;
-            }
+        if (is_null($this->clientIP)) {
+            $this->clientIP = $this->readClientIPFromHeaders();
         }
 
-        return filter_input(INPUT_SERVER, 'REMOTE_ADDR');
+        return $this->clientIP;
     }
 
     /**
@@ -184,5 +163,27 @@ class RequestFromGlobals extends Request
     public function getRawContent()
     {
         return file_get_contents('php://input');
+    }
+
+    /**
+     * @return string
+     */
+    private function readClientIPFromHeaders() {
+        $httpHeaders = [
+            'HTTP_TRUE_CLIENT_IP',
+            'X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED_FOR',
+            'CLIENT_IP',
+            'REMOTE_ADDR',
+        ];
+
+        foreach ($httpHeaders as $key) {
+            $ip = filter_input(INPUT_SERVER, $key);
+            if (!is_null($ip)) {
+                return $ip;
+            }
+        }
+
+        return filter_input(INPUT_SERVER, 'REMOTE_ADDR');
     }
 }
