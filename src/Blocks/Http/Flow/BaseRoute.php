@@ -229,9 +229,10 @@ REGEX;
             return true;
         }
 
-        $segments = $this->parse(
-            $this->getAbsolutePattern()
-        );
+        $pattern = rtrim($this->getAbsolutePattern(), '/') . '/';
+        $requestPath = rtrim($request->getPath(), '/') . '/';
+
+        $segments = $this->parse($pattern);
 
         foreach ($segments as $segment) {
             $regex = $this->buildRegexForRoute($segment);
@@ -239,7 +240,7 @@ REGEX;
 
             $regex = ((bool)$exact) ? "~^$regex$~" : "~^$regex~";
 
-            if ((bool)preg_match($regex, $request->getPath(), $rawParameters)) {
+            if ((bool)preg_match($regex, $requestPath, $rawParameters)) {
                 foreach ($segment as $item) {
                     if (is_array($item)) {
                         $parameterName = $item[0];

@@ -118,7 +118,8 @@ class RequestFromGlobals extends Request
      */
     public function getQueryParams()
     {
-        return $this->getValueFromArray(INPUT_GET);
+        $queryParams = $this->getValueFromArray(INPUT_GET);
+        return (is_null($queryParams)) ? [] : $queryParams;
     }
 
     /**
