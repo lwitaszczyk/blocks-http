@@ -229,8 +229,8 @@ REGEX;
             return true;
         }
 
-        $pattern = rtrim($this->getAbsolutePattern(), '/') . '/';
-        $requestPath = rtrim($request->getPath(), '/') . '/';
+        $pattern = rtrim($this->getAbsolutePattern(), '/');
+        $requestPath = rtrim($request->getPath(), '/');
 
         $segments = $this->parse($pattern);
 
