@@ -50,10 +50,6 @@ class RoutesGroup extends BaseRoute
         return $this;
     }
 
-    public function beforeProcess(Request $request)
-    {
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -62,8 +58,6 @@ class RoutesGroup extends BaseRoute
         if (!$this->match($request, false)) {
             return null;
         }
-
-        $this->beforeProcess($request);
 
         foreach ($this->routes as $route) {
             $response = $route->process($request);
