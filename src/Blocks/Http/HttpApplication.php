@@ -6,6 +6,7 @@ use Blocks\Application;
 use Blocks\Configuration;
 use Blocks\DI\DIAsProxySingleton;
 use Blocks\DI\DIAsSingleton;
+use Blocks\DI\DIAsSingletonByProxy;
 use Blocks\DI\DIAsValue;
 use Blocks\DI\DIByConfiguration;
 use Blocks\DI\DIByService;
@@ -51,7 +52,7 @@ class HttpApplication extends Application
 
         $this->getContainer()->addServices([
             (new DIAsValue(self::REQUEST, $this->request)),
-            (new DIAsProxySingleton(self::SESSION, Session::class))->addArguments([
+            (new DIAsSingletonByProxy(self::SESSION, Session::class))->addArguments([
                 new DIByConfiguration('session.sid', 'SID'),
                 new DIByConfiguration('session.expire', 60),
             ]),
