@@ -1,6 +1,6 @@
 <?php
 
-namespace Blocks\Http\Routing\Exception;
+namespace Blocks\Http\Flow;
 
 use Exception;
 

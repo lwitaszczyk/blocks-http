@@ -4,13 +4,11 @@ namespace Blocks\Http;
 
 use Blocks\Application;
 use Blocks\Configuration;
-use Blocks\DI\DIAsProxySingleton;
 use Blocks\DI\DIAsSingleton;
 use Blocks\DI\DIAsSingletonByProxy;
 use Blocks\DI\DIAsValue;
 use Blocks\DI\DIByConfiguration;
 use Blocks\DI\DIByService;
-use Blocks\Http\Exception\HttpApplicationCanNotFoundRouteException;
 use Blocks\Http\Exception\HttpApplicationCanNotRenderOutputException;
 use Blocks\Http\Native\Cookie;
 use Blocks\Http\Native\Session;
@@ -19,21 +17,11 @@ use Blocks\Http\Request\RequestFromGlobals;
 class HttpApplication extends Application
 {
 
-    const SESSION = 'http-session';
-    const COOKIE = 'http-cookie';
-    const REQUEST = 'http-request';
-    const URL_GENERATOR = 'http-url-generator';
-    const ROUTING = 'http-routing';
-
-    /**
-     * @var Route
-     */
-    private $routing;
-
-    /**
-     * @var Request
-     */
-    private $request;
+    const SESSION = Session::class;
+    const COOKIE = Cookie::class;
+    const REQUEST = Request::class;
+    const URL_GENERATOR = UrlGenerator::class;
+    const ROUTING = 'routing-root';
 
     /**
      * HttpApplication constructor.
@@ -48,17 +36,19 @@ class HttpApplication extends Application
 
         ob_start();
 
-        $this->request = (is_null($request)) ? $this->request = new RequestFromGlobals() : $request;
+        if (is_null($request)) {
+            $request = new RequestFromGlobals();
+        }
 
         $this->getContainer()->addServices([
-            (new DIAsValue(self::REQUEST, $this->request)),
+            (new DIAsValue(self::REQUEST, $request)),
             (new DIAsSingletonByProxy(self::SESSION, Session::class))->addArguments([
                 new DIByConfiguration('session.sid', 'SID'),
                 new DIByConfiguration('session.expire', 60),
             ]),
             (new DIAsSingleton(self::COOKIE, Cookie::class)),
             (new DIAsSingleton(self::URL_GENERATOR, UrlGenerator::class))->addArguments([
-                new DIByService(self::APPLICATION),
+                new DIByService(self::ROUTING),
             ]),
         ]);
     }
@@ -69,10 +59,12 @@ class HttpApplication extends Application
      */
     public function process()
     {
-        $request = $this->getRequest();
-        $routing = $this->getRouting();
+        $routing = $this->getContainer()->get(self::ROUTING);
 
-        $response = $routing->process($request);
+        $response = $routing->process(
+            $this,
+            $this->getContainer()->get(Request::class)
+        );
 
         if ($response instanceof Response) {
             $response->send();
@@ -81,48 +73,5 @@ class HttpApplication extends Application
         }
 
         return $this;
-    }
-
-    /**
-     * @return Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    /**
-     * @return Route
-     */
-    public function getRouting()
-    {
-        if (is_null($this->routing)) {
-            $this->routing = $this->getContainer()->get(self::ROUTING);
-        }
-        return $this->routing;
-    }
-
-    /**
-     * @param $routeName
-     * @param string[] $params
-     * @return string
-     * @throws HttpApplicationCanNotFoundRouteException
-     */
-    public function urlByRouteName($routeName, array $params = [])
-    {
-        $route = $this->findRouteByName($routeName);
-        if (empty($route)) {
-            throw new HttpApplicationCanNotFoundRouteException($routeName);
-        }
-        return $route->generateUrl($params);
-    }
-
-    /**
-     * @param string $name
-     * @return Route
-     */
-    public function findRouteByName($name)
-    {
-        return $this->getRouting()->findByName($name);
     }
 }

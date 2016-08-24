@@ -2,6 +2,8 @@
 
 namespace Blocks\Http;
 
+use Blocks\Application;
+
 interface Route
 {
     /**
@@ -13,10 +15,11 @@ interface Route
     public function match(Request $request, $exact = true);
 
     /**
+     * @param Application $application
      * @param Request $request
-     * @return bool
+     * @return mixed
      */
-    public function process(Request $request);
+    public function process(Application $application, Request $request);
 
     /**
      * @param string $name

@@ -2,42 +2,31 @@
 
 namespace Blocks\Http;
 
-use Blocks\Http\Exception\HttpApplicationCanNotFoundRouteException;
-
 class UrlGenerator
 {
 
     /**
-     * @var HttpApplication
+     * @var Route
      */
-    private $application;
+    private $rootRoute;
 
     /**
-     * @param HttpApplication $application
+     * @param Route $rootRoute
      */
-    public function __construct(HttpApplication $application)
+    public function __construct(Route $rootRoute)
     {
-        $this->application = $application;
+        $this->rootRoute = $rootRoute;
     }
 
     /**
-     * @param $routeName
-     * @param array $params
+     * @param string $routeName
+     * @param mixed[] $params
      * @return string
-     * @throws HttpApplicationCanNotFoundRouteException
      */
     public function byRouteName($routeName, array $params = [])
     {
-        return $this->application->urlByRouteName($routeName, $params);
-    }
-
-    /**
-     * @param Route $route
-     * @param array $params
-     * @return string
-     */
-    public function byRoute(Route $route, array $params = [])
-    {
-        return $this->application->urlByRoute($route, $params);
+        $route = $this->rootRoute->findByName($routeName);
+        $url = $route->generateUrl($params);
+        return $url;
     }
 }

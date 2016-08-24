@@ -21,7 +21,7 @@ class RouteToControllerAsService extends BaseRoute
     /**
      * RouteTo constructor.
      * @param null|string $pattern
-     * @param null|string $serviceId
+     * @param string $serviceId
      */
     public function __construct($pattern, $serviceId)
     {
@@ -57,11 +57,11 @@ class RouteToControllerAsService extends BaseRoute
     /**
      * {@inheritDoc}
      */
-    public function process(Request $request)
+    public function process(Application $application, Request $request)
     {
         if ($this->match($request, false)) {
             foreach ($this->routesToMethod as $routeToMethod) {
-                $response = $routeToMethod->process($request);
+                $response = $routeToMethod->process($application, $request);
                 if (!is_null($response)) {
                     return $response;
                 }

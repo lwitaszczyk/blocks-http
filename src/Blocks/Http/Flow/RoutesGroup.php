@@ -2,9 +2,9 @@
 
 namespace Blocks\Http\Flow;
 
+use Blocks\Application;
 use Blocks\Http\Request;
 use Blocks\Http\Route;
-use Blocks\Http\Routing\Exception\HttpNotFoundException;
 
 class RoutesGroup extends BaseRoute
 {
@@ -53,14 +53,14 @@ class RoutesGroup extends BaseRoute
     /**
      * {@inheritDoc}
      */
-    public function process(Request $request)
+    public function process(Application $application, Request $request)
     {
         if (!$this->match($request, false)) {
             return null;
         }
 
         foreach ($this->routes as $route) {
-            $response = $route->process($request);
+            $response = $route->process($application, $request);
             if (!is_null($response)) {
                 return $response;
             }

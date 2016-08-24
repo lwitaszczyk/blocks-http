@@ -2,6 +2,7 @@
 
 namespace Blocks\Http\Flow;
 
+use Blocks\Application;
 use Blocks\Configuration;
 use Blocks\DI\DIContainer;
 use Blocks\Http\HttpApplication;
@@ -47,7 +48,7 @@ class RouteToMethod extends BaseRoute
     /**
      * {@inheritDoc}
      */
-    public function process(Request $request)
+    public function process(Application $application, Request $request)
     {
         if ($this->match($request)) {
             $controller = $this->routeToController->getController();
@@ -56,7 +57,7 @@ class RouteToMethod extends BaseRoute
             try {
                 $reflectionMethod = new \ReflectionMethod($controller, $methodName);
             } catch (\ReflectionException $e) {
-                throw new \Exception(sprintf(
+                throw new NoMethodInControllerException(sprintf(
                         'Not found method [%s] in controller [%s]',
                         $methodName,
                         get_class($controller))
@@ -88,7 +89,7 @@ class RouteToMethod extends BaseRoute
                 } elseif ($reflectionParameter->isDefaultValueAvailable()) {
                     $parameters[$paramName] = $reflectionParameter->getDefaultValue();
                 } else {
-                    throw new \Exception(sprintf(
+                    throw new NoResolveParameterInActionException(sprintf(
                             'Can not resolve parameter "%s" in action "%s" in controller "%s"',
                             $paramName,
                             $methodName,
