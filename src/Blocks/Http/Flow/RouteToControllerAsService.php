@@ -4,6 +4,7 @@ namespace Blocks\Http\Flow;
 
 use Blocks\Application;
 use Blocks\Http\Request;
+use Blocks\Invoker;
 
 class RouteToControllerAsService extends BaseRoute
 {
@@ -38,7 +39,7 @@ class RouteToControllerAsService extends BaseRoute
     {
         $this->routesToMethod[] = $routeToMethod;
         $routeToMethod->setParentRoute($this);
-        $routeToMethod->setRouteToController($this);
+//        $routeToMethod->setRouteToController($this);
         return $this;
     }
 
@@ -61,9 +62,17 @@ class RouteToControllerAsService extends BaseRoute
     {
         if ($this->match($request, false)) {
             foreach ($this->routesToMethod as $routeToMethod) {
-                $response = $routeToMethod->process($application, $request);
-                if (!is_null($response)) {
-                    return $response;
+                if ($routeToMethod->match($request)) {
+                    /**
+                     * @var Invoker $invoker
+                     */
+                    $invoker = $application->getContainer()->get(Invoker::class);
+
+                    return $invoker->invokeMethod(
+                        $application->getContainer()->get($this->serviceId),
+                        sprintf('%sAction', $routeToMethod->getMethod()),
+                        $request->getParameters()
+                    );
                 }
             }
         }

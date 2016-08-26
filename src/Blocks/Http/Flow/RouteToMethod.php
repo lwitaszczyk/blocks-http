@@ -3,11 +3,7 @@
 namespace Blocks\Http\Flow;
 
 use Blocks\Application;
-use Blocks\Configuration;
-use Blocks\DI\DIContainer;
-use Blocks\Http\HttpApplication;
 use Blocks\Http\Request;
-use Blocks\Http\Session;
 
 class RouteToMethod extends BaseRoute
 {
@@ -16,11 +12,6 @@ class RouteToMethod extends BaseRoute
      * @var string
      */
     private $method;
-
-    /**
-     * @var RouteToControllerAsService
-     */
-    private $routeToController;
 
     /**
      * RouteTo constructor.
@@ -32,17 +23,6 @@ class RouteToMethod extends BaseRoute
     {
         parent::__construct($pattern, $name);
         $this->method = $method;
-        $this->routeToController = null;
-    }
-
-    /**
-     * @param RouteToControllerAsService $routeToController
-     * @return RouteToMethod
-     */
-    public function setRouteToController($routeToController)
-    {
-        $this->routeToController = $routeToController;
-        return $this;
     }
 
     /**
@@ -50,56 +30,7 @@ class RouteToMethod extends BaseRoute
      */
     public function process(Application $application, Request $request)
     {
-        if ($this->match($request)) {
-            $controller = $this->routeToController->getController();
-            $methodName = sprintf('%sAction', $this->method);
-
-            try {
-                $reflectionMethod = new \ReflectionMethod($controller, $methodName);
-            } catch (\ReflectionException $e) {
-                throw new NoMethodInControllerException(sprintf(
-                        'Not found method [%s] in controller [%s]',
-                        $methodName,
-                        get_class($controller))
-                );
-            }
-
-            $requestParameters = $request->getParameters();
-            $parameters = [];
-            foreach ($reflectionMethod->getParameters() as $reflectionParameter) {
-                $paramClass = $reflectionParameter->getClass();
-                $paramName = $reflectionParameter->getName();
-                if (isset($paramClass)) {
-                    //TODO converters
-                    if ($paramClass->getName() === Request::class) {
-                        $parameters[$paramName] =
-                            HttpApplication::getInstance()->getContainer()->get(HttpApplication::REQUEST);
-                    } elseif ($paramClass->getName() === Session::class) {
-                        $parameters[$paramName] =
-                            HttpApplication::getInstance()->getContainer()->get(HttpApplication::SESSION);
-                    } elseif ($paramClass->getName() === Configuration::class) {
-                        $parameters[$paramName] =
-                            HttpApplication::getInstance()->getConfiguration();
-                    } elseif ($paramClass->getName() === DIContainer::class) {
-                        $parameters[$paramName] =
-                            HttpApplication::getInstance()->getContainer();
-                    }
-                } elseif (isset($requestParameters[$paramName])) {
-                    $parameters[$paramName] = $requestParameters[$paramName];
-                } elseif ($reflectionParameter->isDefaultValueAvailable()) {
-                    $parameters[$paramName] = $reflectionParameter->getDefaultValue();
-                } else {
-                    throw new NoResolveParameterInActionException(sprintf(
-                            'Can not resolve parameter "%s" in action "%s" in controller "%s"',
-                            $paramName,
-                            $methodName,
-                            get_class($controller))
-                    );
-                }
-            }
-            return $reflectionMethod->invokeArgs($controller, $parameters);
-        }
-        return null;
+        throw new \Exception('Method process can not be executed');
     }
 
     /**
@@ -111,5 +42,13 @@ class RouteToMethod extends BaseRoute
             return $this;
         }
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
     }
 }

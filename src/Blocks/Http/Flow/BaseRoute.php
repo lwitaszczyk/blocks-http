@@ -75,6 +75,98 @@ REGEX;
     }
 
     /**
+     * @return string
+     */
+    public function getAbsolutePattern()
+    {
+        $absolutePattern = '';
+
+        $parentRoute = $this->getParentRoute();
+        if ($parentRoute instanceof self) {
+            $absolutePattern = $parentRoute->getAbsolutePattern();
+        }
+
+        $absolutePattern .= $this->getPattern();
+        return $absolutePattern;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPattern()
+    {
+        return $this->pattern;
+    }
+
+    /**
+     * @return Route
+     */
+    public function getParentRoute()
+    {
+        return $this->parentRoute;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setParentRoute(Route $parentRoute)
+    {
+        $this->parentRoute = $parentRoute;
+        return $this;
+    }
+
+    /**
+     * @param Request $request
+     * @param bool $exact
+     * @return bool
+     * @throws \Exception
+     */
+    public function match(Request $request, $exact = true)
+    {
+        $exact = (bool)$exact;
+        foreach ($this->attributes as $parameterName => $parameterValue) {
+            $requestParameterValue = $request->getAttribute($parameterName);
+            if (!is_null($requestParameterValue) && ($requestParameterValue !== $parameterValue)) {
+                return false;
+            }
+        }
+
+        if (is_null($this->pattern)) {
+            return true;
+        }
+
+        $pattern = rtrim($this->getAbsolutePattern(), '/');
+        $requestPath = rtrim($request->getPath(), '/');
+
+        $segments = $this->parse($pattern);
+        foreach ($segments as $segment) {
+            $regex = $this->buildRegexForRoute($segment);
+            $regex = $exact ? "~^$regex$~" : "~^$regex~";
+
+            $rawParameters = [];
+            if ((bool)preg_match($regex, $requestPath, $rawParameters)) {
+                foreach ($segment as $item) {
+                    if (is_array($item)) {
+                        $parameterName = $item[0];
+                        $request->setParameter($parameterName, $rawParameters[$parameterName]);
+                    }
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param $route
      * @return array
      * @throws \Exception
@@ -133,125 +225,6 @@ REGEX;
             $routeData[] = substr($route, $offset);
         }
         return $routeData;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAbsolutePattern()
-    {
-        $absolutePattern = '';
-
-        $parentRoute = $this->getParentRoute();
-        if ($parentRoute instanceof self) {
-            $absolutePattern = $parentRoute->getAbsolutePattern();
-        }
-
-        $absolutePattern .= $this->getPattern();
-        return $absolutePattern;
-    }
-
-    /**
-     * @param mixed[] $params
-     * @param array $routeVariant
-     * @return string
-     * @throws \Exception
-     */
-    private function generateUrlFromSegments(array $params, $routeVariant)
-    {
-        $url = '';
-
-        foreach ($routeVariant as $routeSegment) {
-            if (is_array($routeSegment)) {
-                $key = $routeSegment[0];
-                if (array_key_exists($key, $params)) {
-                    $url .= $params[$key];
-                } else {
-                    throw new \Exception(sprintf('Parameter %s to generate url from action %s is required', $key, $this->getName()));
-                }
-            } else {
-                $url .= $routeSegment;
-            }
-        }
-
-        return $url;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPattern()
-    {
-        return $this->pattern;
-    }
-
-    /**
-     * @return Route
-     */
-    public function getParentRoute()
-    {
-        return $this->parentRoute;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setParentRoute(Route $parentRoute)
-    {
-        $this->parentRoute = $parentRoute;
-        return $this;
-    }
-
-    /**
-     * @param Request $request
-     * @param bool $exact
-     * @return bool
-     * @throws \Exception
-     */
-    public function match(Request $request, $exact = true)
-    {
-        foreach ($this->attributes as $parameterName => $parameterValue) {
-            $requestParameterValue = $request->getAttribute($parameterName);
-            if (!is_null($requestParameterValue) && ($requestParameterValue !== $parameterValue)) {
-                return false;
-            }
-        }
-
-        if (is_null($this->pattern)) {
-            return true;
-        }
-
-        $pattern = rtrim($this->getAbsolutePattern(), '/');
-        $requestPath = rtrim($request->getPath(), '/');
-
-        $segments = $this->parse($pattern);
-
-        foreach ($segments as $segment) {
-            $regex = $this->buildRegexForRoute($segment);
-            $rawParameters = [];
-
-            $regex = ((bool)$exact) ? "~^$regex$~" : "~^$regex~";
-
-            if ((bool)preg_match($regex, $requestPath, $rawParameters)) {
-                foreach ($segment as $item) {
-                    if (is_array($item)) {
-                        $parameterName = $item[0];
-                        $request->setParameter($parameterName, $rawParameters[$parameterName]);
-                    }
-                }
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -318,5 +291,31 @@ REGEX;
             ~x',
             $regex
         );
+    }
+
+    /**
+     * @param mixed[] $params
+     * @param array $routeVariant
+     * @return string
+     * @throws \Exception
+     */
+    private function generateUrlFromSegments(array $params, $routeVariant)
+    {
+        $url = '';
+
+        foreach ($routeVariant as $routeSegment) {
+            if (is_array($routeSegment)) {
+                $key = $routeSegment[0];
+                if (array_key_exists($key, $params)) {
+                    $url .= $params[$key];
+                } else {
+                    throw new \Exception(sprintf('Parameter %s for action %s is required', $key, $this->getName()));
+                }
+            } else {
+                $url .= $routeSegment;
+            }
+        }
+
+        return $url;
     }
 }
