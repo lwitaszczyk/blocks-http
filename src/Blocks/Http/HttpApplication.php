@@ -9,7 +9,9 @@ use Blocks\DI\DIAsSingletonByProxy;
 use Blocks\DI\DIAsValue;
 use Blocks\DI\DIByConfiguration;
 use Blocks\DI\DIByService;
+use Blocks\DI\DIByValue;
 use Blocks\Http\Exception\HttpApplicationCanNotRenderOutputException;
+use Blocks\Http\Flow\DefaultRouteMatcher;
 use Blocks\Http\Native\Cookie;
 use Blocks\Http\Native\Session;
 use Blocks\Http\Request\RequestFromGlobals;
@@ -41,15 +43,17 @@ class HttpApplication extends Application
         }
 
         $this->getContainer()->addServices([
-            (new DIAsValue(self::REQUEST, $request)),
-            (new DIAsSingletonByProxy(self::SESSION, Session::class))->addArguments([
+            (new DIAsValue(Request::class, $request)),
+            (new DIAsSingletonByProxy(Session::class, Session::class))->addArguments([
                 new DIByConfiguration('session.sid', 'SID'),
                 new DIByConfiguration('session.expire', 60),
             ]),
-            (new DIAsSingleton(self::COOKIE, Cookie::class)),
-            (new DIAsSingleton(self::URL_GENERATOR, UrlGenerator::class))->addArguments([
+            (new DIAsSingleton(Cookie::class, Cookie::class)),
+            (new DIAsSingleton(UrlGenerator::class, UrlGenerator::class))->addArguments([
+                new DIByValue($this),
                 new DIByService(self::ROUTING),
             ]),
+            (new DIAsSingleton(RouteMatcher::class, DefaultRouteMatcher::class)),
         ]);
     }
 

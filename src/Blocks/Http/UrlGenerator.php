@@ -2,6 +2,8 @@
 
 namespace Blocks\Http;
 
+use Blocks\Application;
+
 class UrlGenerator
 {
 
@@ -11,11 +13,19 @@ class UrlGenerator
     private $rootRoute;
 
     /**
+     * @var Application
+     */
+    private $application;
+
+    /**
+     * UrlGenerator constructor.
+     * @param Application $application
      * @param Route $rootRoute
      */
-    public function __construct(Route $rootRoute)
+    public function __construct(Application $application, Route $rootRoute)
     {
         $this->rootRoute = $rootRoute;
+        $this->application = $application;
     }
 
     /**
@@ -26,7 +36,7 @@ class UrlGenerator
     public function byRouteName($routeName, array $params = [])
     {
         $route = $this->rootRoute->findByName($routeName);
-        $url = $route->generateUrl($params);
+        $url = $route->generateUrl($this->application, $params);
         return $url;
     }
 }

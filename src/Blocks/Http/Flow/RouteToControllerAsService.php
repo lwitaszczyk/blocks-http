@@ -60,9 +60,9 @@ class RouteToControllerAsService extends BaseRoute
      */
     public function process(Application $application, Request $request)
     {
-        if ($this->match($request, false)) {
+        if ($this->match($application, $request, false)) {
             foreach ($this->routesToMethod as $routeToMethod) {
-                if ($routeToMethod->match($request)) {
+                if ($routeToMethod->match($application, $request)) {
                     /**
                      * @var Invoker $invoker
                      */

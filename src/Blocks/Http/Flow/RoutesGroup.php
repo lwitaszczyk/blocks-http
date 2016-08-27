@@ -55,7 +55,7 @@ class RoutesGroup extends BaseRoute
      */
     public function process(Application $application, Request $request)
     {
-        if (!$this->match($request, false)) {
+        if (!$this->match($application, $request, false)) {
             return null;
         }
 

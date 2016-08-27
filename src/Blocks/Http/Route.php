@@ -7,12 +7,13 @@ use Blocks\Application;
 interface Route
 {
     /**
+     * @param Application $application
      * @param Request $request
      * @param bool $exact
      * @return bool
      * @throws \Exception
      */
-    public function match(Request $request, $exact = true);
+    public function match(Application $application, Request $request, $exact = true);
 
     /**
      * @param Application $application
@@ -28,10 +29,11 @@ interface Route
     public function findByName($name);
 
     /**
+     * @param Application $application
      * @param array $params
      * @return string
      */
-    public function generateUrl(array $params = []);
+    public function generateUrl(Application $application, array $params = []);
 
     /**
      * @param Route $parentRoute
@@ -43,4 +45,19 @@ interface Route
      * @return Route|null
      */
     public function getParentRoute();
+
+    /**
+     * @return string|null
+     */
+    public function getPattern();
+
+    /**
+     * @return string|null
+     */
+    public function getAbsolutePattern();
+
+    /**
+     * @return string|null
+     */
+    public function getName();
 }
